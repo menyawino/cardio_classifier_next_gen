@@ -7,8 +7,8 @@ class VariantRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create(self, hgvs: str, genome_build: str, classification: str, evidence: list) -> Variant:
-        obj = Variant(hgvs=hgvs, genome_build=genome_build, classification=classification, evidence=evidence)
+    async def create(self, hgvs: str, genome_build: str, classification: str, evidence: list, created_by: int | None = None) -> Variant:
+        obj = Variant(hgvs=hgvs, genome_build=genome_build, classification=classification, evidence=evidence, created_by=created_by)
         self.session.add(obj)
         await self.session.commit()
         await self.session.refresh(obj)
