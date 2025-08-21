@@ -1,0 +1,58 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cardio
+      POSTGRES_PASSWORD: cardio
+      POSTGRES_DB: cardio
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mcp:
+    build:
+      context: ../mcp-server
+      dockerfile: Dockerfile
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8100:8100"
+    command: uvicorn server:app --host 0.0.0.0 --port 8100 --reload
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      MCP_SERVER_URL: http://mcp:8100
+      DATABASE_URL: postgresql+psycopg://cardio:cardio@postgres:5432/cardio
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mcp
+      - postgres
+  - redis
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE: /api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+
+volumes:
+  pgdata:

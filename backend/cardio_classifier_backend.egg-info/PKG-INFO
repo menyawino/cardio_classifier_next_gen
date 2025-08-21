@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: cardio-classifier-backend
+Version: 0.1.0
+Summary: Backend API for Cardio Classifier
+Author: Cardio Team
+Requires-Python: >=3.11
+Requires-Dist: fastapi
+Requires-Dist: uvicorn[standard]
+Requires-Dist: pydantic>=2
+Requires-Dist: sqlalchemy>=2
+Requires-Dist: alembic
+Requires-Dist: python-jose[cryptography]
+Requires-Dist: passlib[bcrypt]
+Requires-Dist: loguru
+Requires-Dist: httpx
+Requires-Dist: tenacity
+Requires-Dist: aiosqlite
+Requires-Dist: celery[redis]
+Requires-Dist: redis
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-asyncio; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: types-requests; extra == "dev"
