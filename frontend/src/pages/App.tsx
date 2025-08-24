@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { classifyVariant } from '../lib/api';
+import { classifyVariant, setAuthToken, api } from '../lib/api';
 import { RuleBadges } from '../components/RuleBadges';
 import { AuthPanel } from '../components/AuthPanel';
 import { listVariants, getVariantHistory, ClassificationEvent, StoredVariant } from '../lib/variants';
-import axios from 'axios';
+// axios instance provided via api import
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export default function App() {
 
   useEffect(()=>{
     if(token){
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setAuthToken(token);
       refreshVariants();
     }
   },[token]);
@@ -37,10 +37,10 @@ export default function App() {
   }
 
   async function submitBatch(){
-    const lines = batchText.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const lines = batchText.split(/\r?\n/).map((l: string)=>l.trim()).filter(Boolean);
     if(!lines.length) return;
     try {
-      const res = await axios.post('/api/variants/batch', { variants: lines.map(h=>({ hgvs: h }))});
+  const res = await api.post('/variants/batch', { variants: lines.map((h: string)=>({ hgvs: h }))});
       setBatchResult(res.data);
       refreshVariants();
     } catch(e){ setBatchResult([{ error: 'Batch failed'}]); }
@@ -54,7 +54,7 @@ export default function App() {
     <div className="max-w-6xl mx-auto py-8 px-6 space-y-8">
       <header className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Cardio Classifier</h1>
-        <button onClick={()=>{setToken(null); delete axios.defaults.headers.common['Authorization'];}} className="text-sm text-red-600">Logout</button>
+  <button onClick={()=>{setToken(null); setAuthToken(null);}} className="text-sm text-red-600">Logout</button>
       </header>
 
       <section className="grid md:grid-cols-2 gap-8">
